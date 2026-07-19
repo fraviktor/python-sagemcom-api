@@ -39,6 +39,7 @@ from .const import (
     XMO_REQUEST_NO_ERR,
     XMO_UNKNOWN_PATH_ERR,
 )
+from .docsis import _parse_downstream_channels, _parse_upstream_channels
 from .enums import EncryptionMethod
 from .exceptions import (
     AccessRestrictionException,
@@ -55,7 +56,10 @@ from .exceptions import (
     UnknownPathException,
     UnsupportedHostException,
 )
-from .models import Device, DeviceInfo, PortMapping, SpeedTestResult
+from .models import Device, DeviceInfo, DocsisDownstreamChannel, DocsisUpstreamChannel, PortMapping, SpeedTestResult
+
+_DOCSIS_DOWNSTREAM_XPATH = "Device/Docsis/CableModem/Downstreams"
+_DOCSIS_UPSTREAM_XPATH = "Device/Docsis/CableModem/Upstreams"
 
 
 async def retry_login(invocation: Mapping[str, Any]) -> None:
@@ -520,6 +524,24 @@ class SagemcomClient:
             return active_devices
 
         return devices
+
+    async def get_docsis_downstream_channels(self) -> list[DocsisDownstreamChannel]:
+        """Retrieve validated DOCSIS downstream channels.
+
+        Confirmed on FAST3896 Magyar firmware sw23. Frequencies are in Hz,
+        symbol rates in ksps, SNR values in dB, and power levels in dBmV.
+        """
+        data = await self.get_value_by_xpath(_DOCSIS_DOWNSTREAM_XPATH)
+        return _parse_downstream_channels(data)
+
+    async def get_docsis_upstream_channels(self) -> list[DocsisUpstreamChannel]:
+        """Retrieve validated DOCSIS upstream channels.
+
+        Confirmed on FAST3896 Magyar firmware sw23. Frequencies are in Hz,
+        symbol rates in ksps, and power levels in dBmV.
+        """
+        data = await self.get_value_by_xpath(_DOCSIS_UPSTREAM_XPATH)
+        return _parse_upstream_channels(data)
 
     @backoff.on_exception(
         backoff.expo,

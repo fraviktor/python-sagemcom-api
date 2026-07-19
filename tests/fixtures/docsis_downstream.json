@@ -1,0 +1,50 @@
+{
+  "reply": {
+    "uid": 0,
+    "id": 0,
+    "error": {
+      "code": 16777216,
+      "description": "XMO_REQUEST_NO_ERR"
+    },
+    "actions": [
+      {
+        "uid": 1,
+        "id": 0,
+        "error": {
+          "code": 16777238,
+          "description": "XMO_NO_ERR"
+        },
+        "callbacks": [
+          {
+            "uid": 1,
+            "result": {
+              "code": 16777238,
+              "description": "XMO_NO_ERR"
+            },
+            "xpath": "Device/Docsis/CableModem/Downstreams",
+            "parameters": {
+              "value": [
+                {
+                  "uid": 0,
+                  "channel_id": 6,
+                  "lock_status": true,
+                  "frequency": 386000000.0,
+                  "band_width": 8,
+                  "symbol_rate": 6952,
+                  "modulation": "Qam256",
+                  "SNR": 41.0,
+                  "power_level": 8.6,
+                  "unerrored_codewords": 1000,
+                  "correctable_codewords": 3,
+                  "uncorrectable_codewords": 1,
+                  "additional_firmware_field": "ignored"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "events": []
+  }
+}

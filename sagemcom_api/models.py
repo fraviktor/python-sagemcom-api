@@ -167,6 +167,47 @@ class PortMapping:
         return self.uid
 
 
+@dataclass(frozen=True, slots=True)
+class DocsisDownstreamChannel:
+    """Validated DOCSIS downstream channel.
+
+    Frequency is reported in Hz, symbol rate in ksps, SNR in dB, and power
+    level in dBmV. Codeword fields are cumulative counters.
+    """
+
+    uid: int
+    channel_id: int
+    lock_status: bool
+    frequency: float | None = None
+    bandwidth: int | None = None
+    symbol_rate: int | None = None
+    modulation: str | None = None
+    snr: float | None = None
+    power_level: float | None = None
+    unerrored_codewords: int | None = None
+    correctable_codewords: int | None = None
+    uncorrectable_codewords: int | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class DocsisUpstreamChannel:
+    """Validated DOCSIS upstream channel.
+
+    Frequency is reported in Hz, symbol rate in ksps, and power level in dBmV.
+    """
+
+    uid: int
+    channel_id: int
+    lock_status: bool
+    frequency: float | None = None
+    symbol_rate: int | None = None
+    modulation: str | None = None
+    power_level: float | None = None
+    frequency31: str | None = None
+    modulation31: str | None = None
+    profile_id31: str | None = None
+
+
 @dataclass
 class SpeedTestResult:
     """Representation of a speedtest result."""
