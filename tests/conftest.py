@@ -83,6 +83,24 @@ def docsis_upstream_response() -> dict[str, Any]:
 
 
 @pytest.fixture
+def uptime_response() -> dict[str, Any]:
+    """Mock response for gateway uptime."""
+    return load_fixture("uptime.json")
+
+
+@pytest.fixture
+def wan_status_response() -> dict[str, Any]:
+    """Mock response for WAN interface status."""
+    return load_fixture("wan_status.json")
+
+
+@pytest.fixture
+def dsl_rate_response() -> dict[str, Any]:
+    """Mock response for a DSL current rate."""
+    return load_fixture("dsl_rate.json")
+
+
+@pytest.fixture
 def mock_session_factory():
     """Create a factory for mock aiohttp ClientSession.
 

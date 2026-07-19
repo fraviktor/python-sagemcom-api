@@ -56,10 +56,15 @@ from .exceptions import (
     UnknownPathException,
     UnsupportedHostException,
 )
-from .models import Device, DeviceInfo, DocsisDownstreamChannel, DocsisUpstreamChannel, PortMapping, SpeedTestResult
+from .gateway import _parse_dsl_rate, _parse_uptime, _parse_wan_status
+from .models import Device, DeviceInfo, DocsisDownstreamChannel, DocsisUpstreamChannel, PortMapping, SpeedTestResult, WanStatus
 
 _DOCSIS_DOWNSTREAM_XPATH = "Device/Docsis/CableModem/Downstreams"
 _DOCSIS_UPSTREAM_XPATH = "Device/Docsis/CableModem/Upstreams"
+_DSL_DOWNSTREAM_RATE_XPATH = "Device/DSL/Channels/Channel[@uid='1']/DownstreamCurrRate"
+_DSL_UPSTREAM_RATE_XPATH = "Device/DSL/Channels/Channel[@uid='1']/UpstreamCurrRate"
+_UPTIME_XPATH = "Device/DeviceInfo/UpTime"
+_WAN_STATUS_XPATH = "Device/IP/Interfaces/Interface[Alias='IP_DATA']/Status"
 
 
 async def retry_login(invocation: Mapping[str, Any]) -> None:
@@ -197,7 +202,7 @@ class SagemcomClient:
 
         return value
 
-    def __get_response_value(self, response, index=0):
+    def __get_response_value(self, response, index=0, normalize=True):
         """Retrieve response value from value."""
         try:
             value = self.__get_response(response, index)["value"]
@@ -207,7 +212,7 @@ class SagemcomClient:
             value = None
 
         # Rewrite result to snake_case
-        if value is not None:
+        if value is not None and normalize:
             value = humps.decamelize(value)
 
         return value
@@ -410,6 +415,28 @@ class SagemcomClient:
         max_tries=1,
         on_backoff=retry_login,
     )
+    async def _get_raw_value_by_xpath(self, xpath: str, options: dict | None = None) -> object:
+        """Retrieve one raw value without normalizing scalar string content."""
+        action = {
+            "id": 0,
+            "method": "getValue",
+            "xpath": urllib.parse.quote(xpath, "/=[]'@\""),
+            "options": options if options else {},
+        }
+        response = await self.__api_request_async([action], False)
+        return self.__get_response_value(response, normalize=False)
+
+    @backoff.on_exception(
+        backoff.expo,
+        (
+            AuthenticationException,
+            LoginRetryErrorException,
+            LoginTimeoutException,
+            InvalidSessionException,
+        ),
+        max_tries=1,
+        on_backoff=retry_login,
+    )
     async def get_values_by_xpaths(self, xpaths: dict[str, str], options: dict | None = None) -> dict:
         """Retrieve raw values from router using XPath.
 
@@ -542,6 +569,26 @@ class SagemcomClient:
         """
         data = await self.get_value_by_xpath(_DOCSIS_UPSTREAM_XPATH)
         return _parse_upstream_channels(data)
+
+    async def get_uptime(self) -> int:
+        """Retrieve validated gateway uptime in seconds."""
+        data = await self._get_raw_value_by_xpath(_UPTIME_XPATH)
+        return _parse_uptime(data)
+
+    async def get_wan_status(self) -> WanStatus:
+        """Retrieve raw WAN status with normalized connectivity."""
+        data = await self._get_raw_value_by_xpath(_WAN_STATUS_XPATH)
+        return _parse_wan_status(data)
+
+    async def get_dsl_downstream_rate(self) -> int | None:
+        """Retrieve the current DSL downstream rate in kbit/s."""
+        data = await self._get_raw_value_by_xpath(_DSL_DOWNSTREAM_RATE_XPATH)
+        return _parse_dsl_rate(data)
+
+    async def get_dsl_upstream_rate(self) -> int | None:
+        """Retrieve the current DSL upstream rate in kbit/s."""
+        data = await self._get_raw_value_by_xpath(_DSL_UPSTREAM_RATE_XPATH)
+        return _parse_dsl_rate(data)
 
     @backoff.on_exception(
         backoff.expo,

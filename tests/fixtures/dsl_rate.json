@@ -1,0 +1,34 @@
+{
+  "reply": {
+    "uid": 0,
+    "id": 0,
+    "error": {
+      "code": 16777216,
+      "description": "XMO_REQUEST_NO_ERR"
+    },
+    "actions": [
+      {
+        "uid": 1,
+        "id": 0,
+        "error": {
+          "code": 16777238,
+          "description": "XMO_NO_ERR"
+        },
+        "callbacks": [
+          {
+            "uid": 1,
+            "result": {
+              "code": 16777238,
+              "description": "XMO_NO_ERR"
+            },
+            "xpath": "Device/DSL/Channels/Channel[@uid='1']/DownstreamCurrRate",
+            "parameters": {
+              "value": 100000
+            }
+          }
+        ]
+      }
+    ],
+    "events": []
+  }
+}

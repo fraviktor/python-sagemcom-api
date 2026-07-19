@@ -114,6 +114,10 @@ asyncio.run(main())
 - `get_hosts()`
 - `get_docsis_downstream_channels()`
 - `get_docsis_upstream_channels()`
+- `get_uptime()`
+- `get_wan_status()`
+- `get_dsl_downstream_rate()`
+- `get_dsl_upstream_rate()`
 - `get_port_mappings()`
 - `reboot()`
 - `get_value_by_xpath(xpath)`
@@ -131,6 +135,17 @@ Raw units are preserved: frequency is Hz, symbol rate is ksps, SNR is dB, and
 power level is dBmV. Downstream codeword values are cumulative counters. The
 fixture identifiers are synthetic and contain no identifiers from a live
 router.
+
+### Gateway scalar values
+
+`get_uptime()` returns gateway uptime in seconds. `get_wan_status()` preserves
+the raw vendor status and reports `connected` as `True`, `False`, or `None` for
+an unknown state. WAN matching is case-insensitive and ignores non-alphanumeric
+characters.
+
+The DSL current-rate helpers return kbit/s. The firmware sentinel `4294967295`
+is returned as `None`; zero remains a valid rate. Each helper performs an
+independent request so an unsupported optional path cannot hide another value.
 
 ## Advanced
 

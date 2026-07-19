@@ -208,6 +208,14 @@ class DocsisUpstreamChannel:
     profile_id31: str | None = None
 
 
+@dataclass(frozen=True, slots=True)
+class WanStatus:
+    """Raw vendor WAN status and normalized connectivity."""
+
+    raw_status: str
+    connected: bool | None
+
+
 @dataclass
 class SpeedTestResult:
     """Representation of a speedtest result."""
