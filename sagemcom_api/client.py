@@ -101,13 +101,10 @@ class SagemcomClient:
         self.username = username
         self.authentication_method = authentication_method
         self.password = password
-        self._current_nonce = None
         self._password_hash = self.__generate_hash(password)
         self.protocol = "https" if ssl else "http"
 
-        self._server_nonce = ""
-        self._session_id = 0
-        self._request_id = -1
+        self.__reset_session_state()
 
         self.session = (
             session
@@ -135,6 +132,14 @@ class SagemcomClient:
     async def close(self) -> None:
         """Close the websession."""
         await self.session.close()
+
+    def __reset_session_state(self) -> None:
+        """Reset mutable request authentication state to logged-out defaults."""
+        self._server_nonce = ""
+        self._session_id = 0
+        self._request_id = -1
+        self._current_nonce = None
+        self._auth_key = None
 
     def __generate_nonce(self, upper_limit=500000):
         """Generate pseudo random number (nonce) to avoid replay attacks."""
@@ -249,9 +254,7 @@ class SagemcomClient:
                 return result
 
             if error["description"] == XMO_INVALID_SESSION_ERR:
-                self._session_id = 0
-                self._server_nonce = ""
-                self._request_id = -1
+                self.__reset_session_state()
                 raise InvalidSessionException(error)
 
             # Error in one of the actions
@@ -368,9 +371,7 @@ class SagemcomClient:
 
         await self.__api_request_async([actions], False)
 
-        self._session_id = -1
-        self._server_nonce = ""
-        self._request_id = -1
+        self.__reset_session_state()
 
     async def get_encryption_method(self):
         """Determine which encryption method to use for authentication and set it directly."""
@@ -380,11 +381,6 @@ class SagemcomClient:
                 self._password_hash = self.__generate_hash(self.password, encryption_method)
 
                 await self.login()
-
-                self._server_nonce = ""
-                self._session_id = 0
-                self._request_id = -1
-
                 return encryption_method
             except (
                 LoginTimeoutException,
@@ -392,6 +388,8 @@ class SagemcomClient:
                 LoginRetryErrorException,
             ):
                 pass
+            finally:
+                self.__reset_session_state()
 
         return None
 
@@ -636,7 +634,7 @@ class SagemcomClient:
         return await log_response.text()
 
     async def reboot(self):
-        """Reboot Sagemcom F@st device."""
+        """Reboot the device and clear the terminating local session."""
         action = {
             "id": 0,
             "method": "reboot",
@@ -644,10 +642,11 @@ class SagemcomClient:
             "parameters": {"source": "GUI"},
         }
 
-        response = await self.__api_request_async([action], False)
-        data = self.__get_response_value(response)
-
-        return data
+        try:
+            response = await self.__api_request_async([action], False)
+            return self.__get_response_value(response)
+        finally:
+            self.__reset_session_state()
 
     async def run_speed_test(self, block_traffic: bool = False):
         """Run Speed Test on Sagemcom F@st device."""

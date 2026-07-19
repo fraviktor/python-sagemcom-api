@@ -101,6 +101,18 @@ def dsl_rate_response() -> dict[str, Any]:
 
 
 @pytest.fixture
+def reboot_success_response() -> dict[str, Any]:
+    """Mock response for a successful reboot request."""
+    return load_fixture("reboot_success.json")
+
+
+@pytest.fixture
+def logout_success_response() -> dict[str, Any]:
+    """Mock response for a successful logout request."""
+    return load_fixture("logout_success.json")
+
+
+@pytest.fixture
 def mock_session_factory():
     """Create a factory for mock aiohttp ClientSession.
 

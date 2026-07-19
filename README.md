@@ -147,6 +147,13 @@ The DSL current-rate helpers return kbit/s. The firmware sentinel `4294967295`
 is returned as `None`; zero remains a valid rate. Each helper performs an
 independent request so an unsupported optional path cannot hide another value.
 
+### Reboot session lifecycle
+
+`reboot()` clears the client's local session and request-authentication state
+after the reboot request is attempted, including when the request fails. It
+does not send a logout request because the router is already terminating the
+session. The same client can perform a clean login after the router returns.
+
 ## Advanced
 
 ### Determine the EncryptionMethod
