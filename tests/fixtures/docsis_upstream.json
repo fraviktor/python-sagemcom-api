@@ -1,0 +1,48 @@
+{
+  "reply": {
+    "uid": 0,
+    "id": 0,
+    "error": {
+      "code": 16777216,
+      "description": "XMO_REQUEST_NO_ERR"
+    },
+    "actions": [
+      {
+        "uid": 1,
+        "id": 0,
+        "error": {
+          "code": 16777238,
+          "description": "XMO_NO_ERR"
+        },
+        "callbacks": [
+          {
+            "uid": 1,
+            "result": {
+              "code": 16777238,
+              "description": "XMO_NO_ERR"
+            },
+            "xpath": "Device/Docsis/CableModem/Upstreams",
+            "parameters": {
+              "value": [
+                {
+                  "uid": 0,
+                  "channel_id": 3,
+                  "lock_status": true,
+                  "frequency": 23800000.0,
+                  "symbol_rate": 5120,
+                  "modulation": "atdma",
+                  "power_level": 39.299999,
+                  "frequency31": "",
+                  "modulation31": "OFDMA",
+                  "profile_id31": "2",
+                  "additional_firmware_field": "ignored"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "events": []
+  }
+}

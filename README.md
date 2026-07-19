@@ -112,10 +112,25 @@ asyncio.run(main())
 - `login()`
 - `get_device_info()`
 - `get_hosts()`
+- `get_docsis_downstream_channels()`
+- `get_docsis_upstream_channels()`
 - `get_port_mappings()`
 - `reboot()`
 - `get_value_by_xpath(xpath)`
 - `set_value_by_xpath(xpath, value)`
+
+### DOCSIS channel collections
+
+The DOCSIS helpers read each plural channel collection in one request and
+return validated `DocsisDownstreamChannel` or `DocsisUpstreamChannel` models.
+They are confirmed on FAST3896 Magyar firmware `FAST3896_MAGYAR_sw23.83.19.23e`.
+Support on older sw18 firmware is not yet confirmed, and no indexed UID fallback
+is attempted.
+
+Raw units are preserved: frequency is Hz, symbol rate is ksps, SNR is dB, and
+power level is dBmV. Downstream codeword values are cumulative counters. The
+fixture identifiers are synthetic and contain no identifiers from a live
+router.
 
 ## Advanced
 

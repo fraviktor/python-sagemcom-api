@@ -71,6 +71,18 @@ def xpath_invalid_path_response() -> dict[str, Any]:
 
 
 @pytest.fixture
+def docsis_downstream_response() -> dict[str, Any]:
+    """Mock response for a DOCSIS downstream collection."""
+    return load_fixture("docsis_downstream.json")
+
+
+@pytest.fixture
+def docsis_upstream_response() -> dict[str, Any]:
+    """Mock response for a DOCSIS upstream collection."""
+    return load_fixture("docsis_upstream.json")
+
+
+@pytest.fixture
 def mock_session_factory():
     """Create a factory for mock aiohttp ClientSession.
 
